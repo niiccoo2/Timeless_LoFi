@@ -1,0 +1,8 @@
+StartMenu {
+    align-horizontal: center; /* This looks weird rn but will make sense once I add more stuff to start screen */
+    padding: 1 2;
+}
+
+Button { /* Might want to figure out how to make this just for the StartMenu buttons*/
+    margin: 0 0 1 0;
+}

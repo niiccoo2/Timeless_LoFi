@@ -3,7 +3,7 @@ import time
 
 def play_music():
     synth = tinysoundfont.Synth()
-    sfid = synth.sfload("./music/Rhodes.sf2")
+    sfid = synth.sfload("./music/module90.sf2")
 
     seq = tinysoundfont.Sequencer(synth)
     seq.midi_load("./music/lofi_chords.mid")

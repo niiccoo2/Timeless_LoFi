@@ -28,12 +28,8 @@ def notes_to_midi(note_str):
     return midi_notes
 
 def make_music(seed=None):
-    import random
     if seed is not None:
         random.seed(seed)
-    # Removed print(seed) to avoid unnecessary output
-    #print(notes_to_midi("D3 F3 A3 C4 E4 G4"))  # Output: [50, 53, 57, 60, 64, 67]
-    # Chords for C - Am - F - G progression
 
     chords = [
         notes_to_midi("D3 F3 A3 C4 E4 G4"),
@@ -49,16 +45,24 @@ def make_music(seed=None):
 
     track.append(Message('program_change', program=0, time=0))
 
-    for chord in chords:  # Play each chord once
+    for chord in chords:
+        # Play chord
         for note in chord:
             track.append(Message('note_on', note=note, velocity=50, time=0))
-        # Turn off all notes at once after 960 ticks
-        track.append(Message('note_off', note=chord[0], velocity=50, time=960))
+
+        # Hold the chord for a while
+        hold_time = 720  # duration all notes are sustained
+        track.append(Message('note_off', note=chord[0], velocity=50, time=hold_time))
         for note in chord[1:]:
             track.append(Message('note_off', note=note, velocity=50, time=0))
 
+        # Add a pause after the chord fades (rest time)
+        rest_time = 480  # this is the silence before next chord
+        track.append(Message('note_on', note=0, velocity=0, time=rest_time))  # dummy to create time gap
+
     mid.save('./music/lofi_chords.mid')
     print("Saved: lofi_chords.mid")
+
 
 if __name__ == '__main__':
     make_music()
