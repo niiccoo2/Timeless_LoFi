@@ -13,14 +13,25 @@ class StartMenu(VerticalGroup):
             # For now just quit the app; can add other logic here before quitting
             self.app.exit()
 
-    def on_mount(self) -> None:
-        self.styles.gap = "1rem"
 
     def compose(self) -> ComposeResult: # Just filler for now to see how this looks
         """Create child widgets of a stopwatch."""
         yield Button("Resume", id="resume", variant="primary")
         yield Button("New Game", id="new_game", variant="primary")
+        yield Button("Chill Mode", id="chill_mode", variant="primary")
+        yield Button("Credits", id="credits", variant="primary")
         yield Button("Exit", id="exit", variant="error")
+
+class LofiText():
+    TEXT = '''
+ _          _____ _ 
+| |    ___ |  ___(_)
+| |   / _ \| |_  | |
+| |__| (_) |  _| | |
+|_____\___/|_|   |_|
+    '''
+
+    
 
 class TimelessLoFi(App):
     CSS_PATH = "padding.tcss"
