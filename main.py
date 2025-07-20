@@ -18,7 +18,7 @@ class StartMenu(VerticalGroup):
         """Create child widgets of a stopwatch."""
         yield Button("Resume", id="resume", variant="primary")
         yield Button("New Game", id="new_game", variant="primary")
-        yield Button("Chill Mode", id="chill_mode", variant="primary")
+        yield Button("Zen Mode", id="zen_mode", variant="primary")
         yield Button("Credits", id="credits", variant="primary")
         yield Button("Exit", id="exit", variant="error")
 

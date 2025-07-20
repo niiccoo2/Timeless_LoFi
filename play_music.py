@@ -1,13 +1,13 @@
 import tinysoundfont
 import time
 
-def play_music():
+def play_music(file = "./music/lofi_chords.mid"):
     synth = tinysoundfont.Synth()
-    #sfid = synth.sfload("./music/module90.sf2") # Synth
-    sfid = synth.sfload("./music/Double_Felt_Grand.sf2") # Piano
+    sfid = synth.sfload("./music/module90.sf2") # Synth
+    # sfid = synth.sfload("./music/Double_Felt_Grand.sf2") # Piano
 
     seq = tinysoundfont.Sequencer(synth)
-    seq.midi_load("./music/lofi_chords.mid")
+    seq.midi_load(file)
 
     # Larger buffer because latency is not important
     synth.start(buffer_size=4096)
