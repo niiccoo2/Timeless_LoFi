@@ -32,11 +32,11 @@ def make_music(seed=None):
         random.seed(seed)
 
     chords = [
-        notes_to_midi("D3 F3 A3 C4 E4 G4"),
-        notes_to_midi("D3 G3 Bb3 D4 F4 Bb4"),
-        notes_to_midi("D3 F3 A3 C4 E4 G4"),
-        notes_to_midi("Eb3 Gb3 Bb3 Db4 F4 Ab4"),
-        notes_to_midi("Db3 E3 G3 Bb3 Db4 E4 G4")
+        notes_to_midi("D4 F4 A4 C5 E5 G5"),
+        notes_to_midi("D4 G4 A#4 D5 F5 A#5"),
+        notes_to_midi("D4 F4 A4 C5 E5 G5"),
+        notes_to_midi("D#4 F#4 A#4 C#5 F5 G#5"),
+        notes_to_midi("C#4 E4 G4 A#5 C#5 E5 G5")
     ]
 
     mid = MidiFile()
@@ -45,20 +45,52 @@ def make_music(seed=None):
 
     track.append(Message('program_change', program=0, time=0))
 
-    for chord in chords:
-        # Play chord
-        for note in chord:
-            track.append(Message('note_on', note=note, velocity=50, time=0))
+    drum_track = MidiTrack()
+    mid.tracks.append(drum_track)
 
-        # Hold the chord for a while
-        hold_time = 720  # duration all notes are sustained
-        track.append(Message('note_off', note=chord[0], velocity=50, time=hold_time))
-        for note in chord[1:]:
-            track.append(Message('note_off', note=note, velocity=50, time=0))
+    # Program change is not needed for drums on channel 9, but you can set velocity and timing
+    # Define drum notes (e.g., bass drum = 35, snare = 38, closed hi-hat = 42)
+    bass_drum = 35
+    snare = 38
+    hi_hat = 42
 
-        # Add a pause after the chord fades (rest time)
-        rest_time = 480  # this is the silence before next chord
-        track.append(Message('note_on', note=0, velocity=0, time=rest_time))  # dummy to create time gap
+    # Simple drum pattern loop
+    for i in range(5 * len(chords)):
+        time_between_hits = 480  # adjust timing to match chord rhythm
+
+        # Bass drum on beats 1 and 3
+        drum_track.append(Message('note_on', channel=9, note=bass_drum, velocity=100, time=0 if i == 0 else time_between_hits))
+        drum_track.append(Message('note_off', channel=9, note=bass_drum, velocity=0, time=120))
+
+        # Snare on beats 2 and 4
+        drum_track.append(Message('note_on', channel=9, note=snare, velocity=100, time=time_between_hits))
+        drum_track.append(Message('note_off', channel=9, note=snare, velocity=0, time=120))
+
+        # Hi-hat on every beat
+        drum_track.append(Message('note_on', channel=9, note=hi_hat, velocity=80, time=time_between_hits))
+        drum_track.append(Message('note_off', channel=9, note=hi_hat, velocity=0, time=100))
+
+
+    for i in range(5):
+        for chord in chords:
+            # Play chord
+            for note in chord:
+                track.append(Message('note_on', note=note, velocity=50, time=0))
+
+            # Hold the chord for a while
+            if chord == notes_to_midi("D#4 F#4 A#4 C#5 F5 G#5") or chord == notes_to_midi("C#4 E4 G4 A#5 C#5 E5 G5"):
+                hold_time = 1080 # We are making the last two chords play for half the time
+                                # beacuse that sounds a lot better
+            else:
+                hold_time = 2160
+
+            track.append(Message('note_off', note=chord[0], velocity=50, time=hold_time))
+            for note in chord[1:]:
+                track.append(Message('note_off', note=note, velocity=50, time=0))
+
+            # Add a pause after the chord fades (rest time)
+            rest_time = 12  # this is the silence before next chord
+            track.append(Message('note_on', note=0, velocity=0, time=rest_time))  # dummy to create time gap
 
     mid.save('./music/lofi_chords.mid')
     print("Saved: lofi_chords.mid")
