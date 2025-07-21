@@ -1,5 +1,5 @@
 from textual.app import App, ComposeResult
-from textual.widgets import Button, Digits, Footer, Header
+from textual.widgets import Button, Digits, Footer, Header, Static
 from textual.containers import HorizontalGroup, VerticalGroup, VerticalScroll
 
 from make_music import *
@@ -22,8 +22,8 @@ class StartMenu(VerticalGroup):
         yield Button("Credits", id="credits", variant="primary")
         yield Button("Exit", id="exit", variant="error")
 
-class LofiText():
-    TEXT = '''
+
+LOGO = '''
  _          _____ _ 
 | |    ___ |  ___(_)
 | |   / _ \| |_  | |
@@ -41,7 +41,11 @@ class TimelessLoFi(App):
         """Create child widgets for the app."""
         yield Header()
         yield Footer()
-        yield HorizontalGroup(StartMenu())
+        yield HorizontalGroup(
+            StartMenu(),
+            Static(LOGO, classes="logo")
+        )
+
 
     def action_toggle_dark(self) -> None:
         """An action to toggle dark mode."""

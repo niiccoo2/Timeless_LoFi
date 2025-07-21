@@ -27,6 +27,27 @@ def notes_to_midi(note_str):
         midi_notes.append(midi_number)
     return midi_notes
 
+def drums(total_measures, drum_track, note = 47):
+    for i in range(total_measures*4):
+        time_between_hits = 440  # we want the beats every 540 ticks, but because the beat itself is 100 ticks we need to remove 100 ticks
+        drum_track.append(Message('note_on', channel=0, note=note, velocity=80, time=0 if i == 0 else time_between_hits))
+        drum_track.append(Message('note_off', channel=0, note=note, velocity=0, time=100)) # time = 100 makes the note 100 ticks long
+
+def drums2(total_measures, drum_track, bass = 47, high = 59): # low high low low high
+    for i in range(total_measures): 
+        for x in range(4*2): # 4 is number or beats in measure and the 2 makes it twice a beat
+            if x == 0 or x == 4 or x == 5:
+                drum_track.append(Message('note_on', channel=0, note=bass, velocity=80, time=0)) # 370 is twice per beat;  if i == 0 else 270
+                drum_track.append(Message('note_off', channel=0, note=bass, velocity=0, time=100))
+                drum_track.append(Message('note_off', channel=0, note=bass, velocity=0, time=170))
+            elif x == 2 or x == 6:
+                drum_track.append(Message('note_on', channel=0, note=high, velocity=80, time=0)) # 370 is twice per beat;  if i == 0 else 270
+                drum_track.append(Message('note_off', channel=0, note=high, velocity=0, time=100))
+                drum_track.append(Message('note_off', channel=0, note=high, velocity=0, time=170))
+
+            else:
+                drum_track.append(Message('note_off', channel=0, note=bass, velocity=0, time=270))
+
 def make_music(drums = False, seed=None):
     if seed is not None:
         random.seed(seed)
@@ -50,6 +71,11 @@ def make_music(drums = False, seed=None):
     track.append(Message('program_change', channel=1, program=108, time=0)) # Moved the piano to 001-108, not normal midi but good for now
 
     if drums == True: # Drum section 
+        
+        # Drum track on channel 0 (program 5)
+        drum_track = MidiTrack()
+        mid.tracks.append(drum_track)
+        drum_track.append(Message('program_change', channel=0, program=5, time=0))
 
         if random.randint(1,2) == 1: # Picks a random type of drums
             bass = 47
@@ -58,44 +84,21 @@ def make_music(drums = False, seed=None):
             bass = 65
             high = 71
 
-        # Drum track on channel 0 (program 5)
-        drum_track = MidiTrack()
-        mid.tracks.append(drum_track)
-        drum_track.append(Message('program_change', channel=0, program=5, time=0))
-
         if random.randint(1,2) == 1:
-            for i in range(total_measures): # low high low low high
-                
+            drums2(total_measures, drum_track, bass, high) # low high low low high
 
-                # low high low low high
-                for x in range(4*2): # 4 is number or beats in measure and the 2 makes it twice a beat
-                    if x == 0 or x == 4 or x == 5:
-                        drum_track.append(Message('note_on', channel=0, note=bass, velocity=80, time=0)) # 370 is twice per beat;  if i == 0 else 270
-                        drum_track.append(Message('note_off', channel=0, note=bass, velocity=0, time=100))
-                        drum_track.append(Message('note_off', channel=0, note=bass, velocity=0, time=170))
-                    elif x == 2 or x == 6:
-                        drum_track.append(Message('note_on', channel=0, note=high, velocity=80, time=0)) # 370 is twice per beat;  if i == 0 else 270
-                        drum_track.append(Message('note_off', channel=0, note=high, velocity=0, time=100))
-                        drum_track.append(Message('note_off', channel=0, note=high, velocity=0, time=170))
-
-                    else:
-                        drum_track.append(Message('note_off', channel=0, note=bass, velocity=0, time=270))
-
-        else: # Hi-hat on every beat
-            for i in range(total_measures*4):
-                time_between_hits = 440  # we want the beats every 540 ticks, but because the beat itself is 100 ticks we need to remove 100 ticks
-                drum_track.append(Message('note_on', channel=0, note=bass, velocity=80, time=0 if i == 0 else time_between_hits))
-                drum_track.append(Message('note_off', channel=0, note=bass, velocity=0, time=100)) # time = 100 makes the note 100 ticks long
+        else:
+            drums(total_measures, drum_track, bass) # Hi-hat on every beat
 
     measure = 0
-    while measure < total_measures:
+    while measure < total_measures: # This runs once per measure
         for chord in chords:
             # Play chord
             for note in chord:
                 track.append(Message('note_on', channel=1, note=note, velocity=50, time=0))
 
             # Hold the chord for a while
-            if chord == notes_to_midi("D#4 F#4 A#4 C#5 F5 G#5") or chord == notes_to_midi("C#4 E4 G4 A#5 C#5 E5 G5"):
+            if chord in chords[-2:]: # Last two chords
                 hold_time = 1080 # We are making the last two chords play for half the time
                                 # beacuse that sounds a lot better
                 measure += 0.5 # adding half a measure to the count because these play for half as long
