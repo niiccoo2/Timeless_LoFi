@@ -27,7 +27,7 @@ def notes_to_midi(note_str):
         midi_notes.append(midi_number)
     return midi_notes
 
-def drums(total_measures, drum_track, note = 47):
+def drums1(total_measures, drum_track, note = 47):
     for i in range(total_measures*4):
         time_between_hits = 440  # we want the beats every 540 ticks, but because the beat itself is 100 ticks we need to remove 100 ticks
         drum_track.append(Message('note_on', channel=0, note=note, velocity=80, time=0 if i == 0 else time_between_hits))
@@ -88,7 +88,7 @@ def make_music(drums = False, seed=None):
             drums2(total_measures, drum_track, bass, high) # low high low low high
 
         else:
-            drums(total_measures, drum_track, bass) # Hi-hat on every beat
+            drums1(total_measures, drum_track, bass) # Hi-hat on every beat
 
     measure = 0
     while measure < total_measures: # This runs once per measure
